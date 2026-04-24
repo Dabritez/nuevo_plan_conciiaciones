@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nuevo Modelo Comercial - Suite de Conciliaciones</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f9fa;color:#1a1a1a;min-height:100vh}
+.header{background:#1F3864;color:#fff;padding:1.25rem 2rem}
+.header h1{font-size:18px;font-weight:500;letter-spacing:-.3px}
+.header .sub{font-size:13px;opacity:.65;margin-top:3px}
+.header .conf{display:inline-block;background:rgba(255,255,255,.15);font-size:11px;padding:3px 9px;border-radius:10px;margin-top:6px}
+.nav{background:#fff;border-bottom:1px solid #e5e7eb;padding:0 2rem;display:flex;gap:0;overflow-x:auto}
+.nav button{padding:13px 16px;border:none;background:none;color:#6b7280;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s}
+.nav button.active{color:#1F3864;border-bottom-color:#1F3864;font-weight:500}
+.nav button:hover:not(.active){color:#374151;background:#f9fafb}
+.main{max-width:900px;margin:0 auto;padding:2rem}
+.screen{display:none}.screen.active{display:block}
+.section-title{font-size:22px;font-weight:500;color:#1a1a1a;margin-bottom:.2rem}
+.section-sub{font-size:14px;color:#6b7280;margin-bottom:1.5rem}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:1rem 0}
+.kpi{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:.9rem 1rem}
+.kpi .label{font-size:12px;color:#6b7280;margin-bottom:4px}
+.kpi .value{font-size:20px;font-weight:500;color:#1a1a1a}
+.kpi .sub{font-size:11px;color:#9ca3af;margin-top:2px}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+.card h3{font-size:15px;font-weight:500;color:#1a1a1a;margin-bottom:1rem}
+table.rt{width:100%;border-collapse:collapse;font-size:13px}
+table.rt th{text-align:left;padding:7px 10px;background:#f3f4f6;color:#6b7280;font-weight:500;font-size:12px}
+table.rt td{padding:8px 10px;border-bottom:1px solid #f3f4f6;color:#1a1a1a}
+table.rt tr:last-child td{border-bottom:none}
+table.rt .num{text-align:right;font-variant-numeric:tabular-nums}
+table.rt .bold{font-weight:500}
+table.rt .green{color:#15803d}
+table.rt .red{color:#dc2626}
+.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:1rem 0}
+.plan-card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:1.25rem}
+.plan-card.featured{border:2px solid #2E5FA3}
+.plan-badge{display:inline-block;background:#eff6ff;color:#1d4ed8;font-size:11px;padding:3px 10px;border-radius:10px;font-weight:500}
+.best-badge{display:inline-block;background:#dcfce7;color:#15803d;font-size:11px;padding:2px 8px;border-radius:8px;font-weight:500}
+.plan-price{font-size:26px;font-weight:500;color:#1a1a1a;margin:8px 0 4px}
+.plan-price span{font-size:13px;font-weight:400;color:#6b7280}
+.plan-mrr{font-size:13px;color:#6b7280;margin-bottom:12px}
+.divider{height:1px;background:#f3f4f6;margin:1rem 0}
+.plan-feature{font-size:13px;color:#374151;padding:3px 0;display:flex;gap:8px;align-items:flex-start}
+.plan-feature::before{content:"";width:6px;height:6px;border-radius:50%;background:#16a34a;margin-top:5px;flex-shrink:0}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:8px;font-weight:500}
+.tag-ok{background:#dcfce7;color:#15803d}
+.tag-warn{background:#fef9c3;color:#854d0e}
+.tag-danger{background:#fee2e2;color:#b91c1c}
+.tag-info{background:#eff6ff;color:#1d4ed8}
+.toggle-row{display:flex;align-items:center;gap:10px;margin-bottom:1rem;flex-wrap:wrap}
+.toggle-row label{font-size:13px;color:#6b7280;font-weight:500}
+.toggle-row select{font-size:13px;padding:6px 10px;border-radius:8px;border:1px solid #d1d5db;background:#fff;color:#1a1a1a;cursor:pointer}
+.bar-wrap{display:flex;align-items:center;gap:10px;margin:6px 0}
+.bar-label{font-size:12px;color:#6b7280;width:110px;flex-shrink:0}
+.bar-track{flex:1;height:10px;background:#f3f4f6;border-radius:5px;overflow:hidden}
+.bar-fill{height:100%;border-radius:5px;transition:width .4s}
+.bar-val{font-size:13px;font-weight:500;color:#1a1a1a;width:85px;text-align:right;flex-shrink:0}
+.month-block{background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:.9rem 1rem;margin-bottom:8px}
+.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.mh .mn{font-size:14px;font-weight:500;color:#1a1a1a}
+.mh .mt{font-size:18px;font-weight:500;color:#15803d}
+.income-row{display:flex;justify-content:space-between;font-size:12px;color:#6b7280;padding:2px 0}
+.income-row .iv{color:#374151;font-weight:500}
+.mrr-pill{display:inline-block;background:#eff6ff;color:#1d4ed8;font-size:11px;padding:3px 10px;border-radius:10px;margin-top:8px;font-weight:500}
+.step-item{display:flex;gap:12px;padding:.8rem 0;border-bottom:1px solid #f3f4f6}
+.step-item:last-child{border-bottom:none}
+.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;margin-top:1px}
+.sn-blue{background:#eff6ff;color:#1d4ed8}
+.sn-red{background:#fee2e2;color:#b91c1c}
+.sn-warn{background:#fef9c3;color:#854d0e}
+.step-content .st{font-size:13px;font-weight:500;color:#1a1a1a}
+.step-content .sd{font-size:12px;color:#6b7280;margin-top:3px;line-height:1.5}
+.step-content .ss{margin-top:5px}
+.pipe-row{display:flex;gap:6px;margin:1rem 0;flex-wrap:wrap;align-items:center}
+.pipe-box{flex:1;min-width:90px;background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:.8rem;text-align:center}
+.pipe-box .pv{font-size:24px;font-weight:500;color:#1F3864}
+.pipe-box .pl{font-size:11px;color:#6b7280;margin-top:2px}
+.pipe-arrow{font-size:22px;color:#d1d5db;flex-shrink:0}
+.info-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:1rem 1.25rem;margin-bottom:1rem}
+.info-box .it{font-size:13px;font-weight:500;color:#1e40af;margin-bottom:4px}
+.info-box .id{font-size:13px;color:#1d4ed8;line-height:1.6}
+.green-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:1rem 1.25rem;margin-top:.75rem}
+.green-box .gl{font-size:12px;color:#15803d;margin-bottom:4px}
+.green-box .gv{font-size:22px;font-weight:500;color:#15803d}
+.green-box .gs{font-size:12px;color:#4ade80;margin-top:2px}
+.mrr-explain{background:#f0f9ff;border-left:3px solid #2E5FA3;border-radius:0 8px 8px 0;padding:.9rem 1.1rem;margin:1rem 0}
+.mrr-explain .met{font-size:13px;font-weight:500;color:#1F3864;margin-bottom:6px}
+.mrr-explain .med{font-size:13px;color:#374151;line-height:1.6}
+.sector-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:1rem 0}
+.sector-box{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:.75rem;text-align:center}
+.sector-icon{font-size:24px;margin-bottom:4px}
+.sector-name{font-size:12px;font-weight:500;color:#374151}
+.sector-sub{font-size:11px;color:#9ca3af;margin-top:2px}
+.slider-group{display:flex;flex-direction:column;gap:12px;margin:1rem 0}
+.slider-row{display:flex;align-items:center;gap:12px}
+.slider-row label{font-size:13px;color:#374151;font-weight:500;width:130px;flex-shrink:0}
+.slider-row input[type=range]{flex:1}
+.slider-row .sv{font-size:14px;font-weight:500;color:#1F3864;width:30px;text-align:right}
+.cost-calc{background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:1rem;margin-bottom:1rem}
+.cost-calc .cc-title{font-size:13px;font-weight:500;color:#6b7280;margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.5px;font-size:11px}
+.cost-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #f3f4f6;font-size:13px}
+.cost-row:last-child{border-bottom:none;font-weight:500;padding-top:8px;font-size:14px}
+.cost-row .cn{color:#374151}
+.cost-row .cv{color:#1a1a1a;font-variant-numeric:tabular-nums}
+.esc-tabs{display:flex;gap:6px;margin-bottom:1.25rem;flex-wrap:wrap}
+.esc-tab{padding:7px 14px;border-radius:20px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;font-size:13px;cursor:pointer;transition:all .15s}
+.esc-tab.active{background:#1F3864;color:#fff;border-color:#1F3864;font-weight:500}
+@media(max-width:600px){
+  .plan-grid{grid-template-columns:1fr}
+  .main{padding:1rem}
+  .header{padding:1rem}
+  .slider-row label{width:100px}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Nuevo Modelo Comercial &mdash; Suite de Conciliaciones</h1>
+  <div class="sub">Presentacion para socios &nbsp;&middot;&nbsp; Lanzamiento Mayo 2026</div>
+  <div class="conf">Confidencial</div>
+</div>
+
+<div class="nav">
+  <button class="active" onclick="show('modelo',this)">Como funciona</button>
+  <button onclick="show('planes',this)">Planes</button>
+  <button onclick="show('costos',this)">Rentabilidad</button>
+  <button onclick="show('proyeccion',this)">Proyeccion</button>
+  <button onclick="show('pipeline',this)">Pipeline</button>
+  <button onclick="show('accion',this)">Plan de accion</button>
+</div>
+
+<div class="main">
+
+<!-- ══ COMO FUNCIONA ══ -->
+<div id="modelo" class="screen active">
+  <div class="section-title">Como funciona el modelo</div>
+  <div class="section-sub">Automatizacion de conciliaciones bancarias, procesadoras y bocas de cobranza en modalidad B2B</div>
+
+  <div style="font-size:12px;font-weight:500;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Sectores objetivo</div>
+  <div class="sector-grid">
+    <div class="sector-box"><div class="sector-icon">&#128138;</div><div class="sector-name">Farmacias</div><div class="sector-sub">Alto volumen de cobros</div></div>
+    <div class="sector-box"><div class="sector-icon">&#128717;</div><div class="sector-name">Retail</div><div class="sector-sub">Multi-procesadora</div></div>
+    <div class="sector-box"><div class="sector-icon">&#128722;</div><div class="sector-name">Supermercados</div><div class="sector-sub">Multiples cajas</div></div>
+    <div class="sector-box"><div class="sector-icon">&#128187;</div><div class="sector-name">Electrodomesticos</div><div class="sector-sub">Cuotas y financiacion</div></div>
+  </div>
+
+  <div class="card">
+    <h3>Las dos fuentes de ingreso</h3>
+    <table class="rt">
+      <tr><th>Tipo</th><th>Cuando entra</th><th>Monto</th><th>Caracteristica</th></tr>
+      <tr><td class="bold">Setup</td><td>Al firmar el contrato</td><td class="num">USD 2.200 / 3.600</td><td><span class="tag tag-warn">Pago unico</span></td></tr>
+      <tr><td class="bold">MRR</td><td>Desde que la entidad entra en produccion</td><td class="num">USD 150 / ent / mes</td><td><span class="tag tag-ok">Recurrente</span></td></tr>
+    </table>
+  </div>
+
+  <div class="mrr-explain">
+    <div class="met">Que es el MRR (Monthly Recurring Revenue)</div>
+    <div class="med">Es la plata fija que entra todos los meses de manera predecible, sin necesidad de cerrar nuevos contratos. Cada entidad que entra en produccion aporta USD 150 por mes indefinidamente mientras el cliente este activo. El MRR se acumula con cada nuevo cliente — nunca baja mientras no haya cancelaciones. Es el numero mas importante del negocio porque determina el ingreso garantizado mes a mes.</div>
+  </div>
+
+  <div class="card">
+    <h3>Cronograma tipo de un contrato</h3>
+    <div class="step-item"><div class="step-num sn-blue">1</div><div class="step-content"><div class="st">Firma del contrato — Dia 1</div><div class="sd">Entra el 50% del Setup. Explora USD 1.100 &mdash; Impulsa USD 1.800</div></div></div>
+    <div class="step-item"><div class="step-num sn-blue">2</div><div class="step-content"><div class="st">Segunda cuota — Dia 30</div><div class="sd">Vence el 50% restante del Setup</div></div></div>
+    <div class="step-item"><div class="step-num sn-blue">3</div><div class="step-content"><div class="st">Implementacion — Semana 4 a 6</div><div class="sd">Las entidades entran en produccion una a una</div></div></div>
+    <div class="step-item"><div class="step-num sn-blue">4</div><div class="step-content"><div class="st">MRR activo — Mes 2 en adelante</div><div class="sd">USD 150 por entidad por mes, indefinidamente mientras el cliente este activo</div></div></div>
+  </div>
+
+  <div class="card">
+    <h3>Como crece el MRR mes a mes (escenario minimo)</h3>
+    <div style="font-size:13px;color:#6b7280;margin-bottom:14px;line-height:1.6">Con 2 Impulsa + 2 Explora por mes, asi se acumula el MRR. Desde septiembre entran USD 18.000 por mes aunque no se cierre ningun contrato nuevo.</div>
+    <div class="bar-wrap"><div class="bar-label">Junio</div><div class="bar-track"><div class="bar-fill" style="width:17%;background:#378ADD"></div></div><div class="bar-val">USD 4.500</div></div>
+    <div class="bar-wrap"><div class="bar-label">Julio</div><div class="bar-track"><div class="bar-fill" style="width:33%;background:#378ADD"></div></div><div class="bar-val">USD 9.000</div></div>
+    <div class="bar-wrap"><div class="bar-label">Agosto</div><div class="bar-track"><div class="bar-fill" style="width:50%;background:#378ADD"></div></div><div class="bar-val">USD 13.500</div></div>
+    <div class="bar-wrap"><div class="bar-label">Septiembre</div><div class="bar-track"><div class="bar-fill" style="width:67%;background:#1D9E75"></div></div><div class="bar-val">USD 18.000</div></div>
+    <div style="font-size:11px;color:#9ca3af;margin-top:10px">MRR mensual garantizado sin vender nada nuevo desde septiembre</div>
+  </div>
+</div>
+
+<!-- ══ PLANES ══ -->
+<div id="planes" class="screen">
+  <div class="section-title">Estructura de planes</div>
+  <div class="section-sub">Mensual unificado en USD 150 por entidad &mdash; descuento de volumen solo en el Setup</div>
+
+  <div class="plan-grid">
+    <div class="plan-card">
+      <div class="plan-badge">Explora</div>
+      <div class="plan-price">USD 2.200 <span>+ IVA</span></div>
+      <div class="plan-mrr">USD 150 / entidad / mes &nbsp;&middot;&nbsp; hasta 5 entidades</div>
+      <div class="divider"></div>
+      <div class="plan-feature">MRR maximo: USD 750 / mes</div>
+      <div class="plan-feature">Soporte 24x7</div>
+      <div class="plan-feature">Tablero de metricas</div>
+      <div style="margin-top:12px;font-size:12px;color:#6b7280">Empresa que comienza a automatizar</div>
+    </div>
+    <div class="plan-card featured">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:0">
+        <div class="plan-badge">Impulsa</div>
+        <div class="best-badge">Mayor margen</div>
+      </div>
+      <div class="plan-price">USD 3.600 <span>+ IVA</span></div>
+      <div class="plan-mrr">USD 150 / entidad / mes &nbsp;&middot;&nbsp; hasta 10 entidades</div>
+      <div class="divider"></div>
+      <div class="plan-feature">MRR maximo: USD 1.500 / mes</div>
+      <div class="plan-feature">Soporte dedicado 24x7</div>
+      <div class="plan-feature">Tablero de metricas avanzado</div>
+      <div style="margin-top:12px;font-size:12px;color:#6b7280">Empresa con operacion media-alta</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Forma de pago del Setup</h3>
+    <table class="rt">
+      <tr><th>Cuota</th><th>Momento</th><th class="num">Explora</th><th class="num">Impulsa</th></tr>
+      <tr><td>Primera &mdash; 50%</td><td>Al confirmar el contrato (firma)</td><td class="num">USD 1.100</td><td class="num">USD 1.800</td></tr>
+      <tr><td>Segunda &mdash; 50%</td><td>A los 30 dias de la firma</td><td class="num">USD 1.100</td><td class="num">USD 1.800</td></tr>
+      <tr><td class="bold">Mensual por entidad</td><td>Desde que entra en produccion</td><td class="num bold">USD 150</td><td class="num bold">USD 150</td></tr>
+    </table>
+  </div>
+
+  <div class="info-box">
+    <div class="it">Una entidad = una cuenta bancaria / procesadora / boca de cobranza</div>
+    <div class="id">El precio mensual es identico por entidad en ambos planes. El descuento de volumen de Impulsa se aplica unicamente en el Setup. Esto garantiza que el cliente mas grande siempre genere mas MRR que el cliente chico.</div>
+  </div>
+</div>
+
+<!-- ══ RENTABILIDAD ══ -->
+<div id="costos" class="screen">
+  <div class="section-title">Rentabilidad por plan</div>
+  <div class="section-sub">Contrato anual &mdash; todos los costos incluidos</div>
+
+  <div class="toggle-row">
+    <label>Ver plan:</label>
+    <select id="plan-sel" onchange="updateCostos()">
+      <option value="explora">Explora</option>
+      <option value="impulsa">Impulsa</option>
+    </select>
+  </div>
+
+  <div class="card">
+    <h3>De donde sale el costo de USD 481 por entidad</h3>
+    <div class="cost-calc">
+      <div class="cc-title">Equipo de desarrollo interno</div>
+      <div class="cost-row"><span class="cn">Desarrollador 1 &mdash; Gs 4.500.000 / mes</span><span class="cv">USD 692</span></div>
+      <div class="cost-row"><span class="cn">Desarrollador 2 &mdash; Gs 8.000.000 / mes</span><span class="cv">USD 1.231</span></div>
+      <div class="cost-row"><span class="cn">Tipo de cambio aplicado</span><span class="cv">Gs 6.500 por USD</span></div>
+      <div class="cost-row"><span class="cn bold">Costo total del equipo por mes</span><span class="cv bold">USD 1.923</span></div>
+    </div>
+    <div class="cost-calc">
+      <div class="cc-title">Capacidad de produccion</div>
+      <div class="cost-row"><span class="cn">Entidades que implementa cada desarrollador por mes</span><span class="cv">2 entidades</span></div>
+      <div class="cost-row"><span class="cn">Capacidad total del equipo por mes</span><span class="cv">4 entidades</span></div>
+      <div class="cost-row"><span class="cn bold">Costo por entidad: USD 1.923 / 4</span><span class="cv bold" style="color:#1F3864">USD 481</span></div>
+    </div>
+  </div>
+
+  <div class="kpi-grid" id="costos-kpis"></div>
+
+  <div class="card">
+    <h3 id="costos-title">Desglose anual</h3>
+    <div style="font-size:12px;font-weight:500;color:#15803d;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Ingresos</div>
+    <table class="rt" id="ing-table"></table>
+    <div style="margin-top:1rem;font-size:12px;font-weight:500;color:#dc2626;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Costos</div>
+    <table class="rt" id="cos-table"></table>
+    <div class="green-box" id="result-box"></div>
+  </div>
+
+  <div class="card">
+    <h3>Comparativa de margenes entre planes</h3>
+    <div class="bar-wrap"><div class="bar-label">Explora 61%</div><div class="bar-track"><div class="bar-fill" style="width:61%;background:#378ADD"></div></div><div class="bar-val">USD 6.845</div></div>
+    <div class="bar-wrap"><div class="bar-label">Impulsa 66%</div><div class="bar-track"><div class="bar-fill" style="width:66%;background:#1D9E75"></div></div><div class="bar-val">USD 14.190</div></div>
+    <div style="font-size:11px;color:#9ca3af;margin-top:10px">Margen neto anual por cliente activo en contrato de 12 meses</div>
+  </div>
+</div>
+
+<!-- ══ PROYECCION ══ -->
+<div id="proyeccion" class="screen">
+  <div class="section-title">Proyeccion de ingresos</div>
+  <div class="section-sub">Mayo a agosto 2026 &mdash; vendedor: David</div>
+
+  <div class="esc-tabs">
+    <button class="esc-tab active" onclick="setEsc('min',this)">Minimo</button>
+    <button class="esc-tab" onclick="setEsc('opt',this)">Optimista</button>
+    <button class="esc-tab" onclick="setEsc('custom',this)">Personalizado</button>
+  </div>
+
+  <div id="custom-controls" style="display:none" class="card">
+    <h3>Configurar escenario personalizado</h3>
+    <div class="slider-group">
+      <div class="slider-row">
+        <label>Impulsa por mes</label>
+        <input type="range" min="0" max="8" step="1" value="2" id="sl-impulsa" oninput="updateSliders()">
+        <span class="sv" id="val-impulsa">2</span>
+      </div>
+      <div class="slider-row">
+        <label>Explora por mes</label>
+        <input type="range" min="0" max="8" step="1" value="2" id="sl-explora" oninput="updateSliders()">
+        <span class="sv" id="val-explora">2</span>
+      </div>
+    </div>
+    <div id="custom-preview" style="font-size:13px;color:#6b7280;margin-top:.5rem"></div>
+  </div>
+
+  <div class="kpi-grid" id="proy-kpis"></div>
+  <div id="meses-container"></div>
+
+  <div class="card" style="margin-top:1rem">
+    <h3>Como leer cada bloque mensual</h3>
+    <table class="rt">
+      <tr><th>Linea</th><th>Que significa</th></tr>
+      <tr><td class="bold">Setup 50% al cierre</td><td>La mitad del Setup de los contratos cerrados ese mes, cobrada el dia de la firma</td></tr>
+      <tr><td class="bold">Setup 50% mes anterior</td><td>La segunda cuota de los contratos del mes pasado, que vence a 30 dias. En mayo es cero porque es el primer mes.</td></tr>
+      <tr><td class="bold">MRR clientes activos</td><td>El mensual de todos los clientes ya en produccion. En mayo es cero porque ningun cliente esta en produccion todavia.</td></tr>
+      <tr><td class="bold">MRR desde mes siguiente</td><td>El MRR total garantizado que entrara el proximo mes</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══ PIPELINE ══ -->
+<div id="pipeline" class="screen">
+  <div class="section-title">Pipeline comercial de David</div>
+  <div class="section-sub">La matematica detras de los objetivos de cierre mensuales</div>
+
+  <div class="pipe-row">
+    <div class="pipe-box"><div class="pv">200</div><div class="pl">Mensajes / mes</div></div>
+    <div class="pipe-arrow">&#8250;</div>
+    <div class="pipe-box"><div class="pv">40</div><div class="pl">Respuestas</div></div>
+    <div class="pipe-arrow">&#8250;</div>
+    <div class="pipe-box"><div class="pv">16</div><div class="pl">Reuniones</div></div>
+    <div class="pipe-arrow">&#8250;</div>
+    <div class="pipe-box"><div class="pv">4-6</div><div class="pl">Cierres</div></div>
+  </div>
+
+  <div class="card">
+    <h3>KPIs semanales, mensuales y Q2</h3>
+    <table class="rt">
+      <tr><th>Indicador</th><th class="num">Semanal</th><th class="num">Mensual</th><th class="num">Q2</th></tr>
+      <tr><td>Conexiones LinkedIn</td><td class="num">100</td><td class="num">400</td><td class="num">800</td></tr>
+      <tr><td>Mensajes de prospeccion</td><td class="num">50</td><td class="num">200</td><td class="num">400</td></tr>
+      <tr><td>Respuestas positivas</td><td class="num">10</td><td class="num">40</td><td class="num">80</td></tr>
+      <tr><td>Reuniones de diagnostico</td><td class="num">4</td><td class="num">16</td><td class="num">32</td></tr>
+      <tr><td>Propuestas enviadas</td><td class="num">4</td><td class="num">16</td><td class="num">32</td></tr>
+      <tr><td class="bold">Contratos cerrados</td><td class="num bold">1</td><td class="num bold">4 min / 6 opt</td><td class="num bold">8 min / 12 opt</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Proceso de venta &mdash; del contacto al cierre</h3>
+    <div class="step-item"><div class="step-num sn-blue">1</div><div class="step-content"><div class="st">Primer contacto &mdash; LinkedIn</div><div class="sd">Mensaje corto sobre el dolor del cliente. Sin pedir reunion de entrada.</div><div class="ss"><span class="tag tag-info">Dia 1</span></div></div></div>
+    <div class="step-item"><div class="step-num sn-blue">2</div><div class="step-content"><div class="st">Respuesta positiva</div><div class="sd">Enviar video de 2 minutos del producto + caso de exito con numeros reales</div><div class="ss"><span class="tag tag-info">Dia 2-3</span></div></div></div>
+    <div class="step-item"><div class="step-num sn-blue">3</div><div class="step-content"><div class="st">Reunion de diagnostico</div><div class="sd">Llamada de 20 minutos para entender volumen de entidades y situacion actual</div><div class="ss"><span class="tag tag-info">Semana 1-2</span></div></div></div>
+    <div class="step-item"><div class="step-num sn-blue">4</div><div class="step-content"><div class="st">Propuesta personalizada</div><div class="sd">Plan recomendado, cronograma de implementacion y condiciones de pago</div><div class="ss"><span class="tag tag-info">1-2 dias post reunion</span></div></div></div>
+    <div class="step-item"><div class="step-num sn-blue">5</div><div class="step-content"><div class="st">Cierre y firma</div><div class="sd">Confirmar plan, firmar contrato, cobrar el 50% del Setup</div><div class="ss"><span class="tag tag-ok">Semana 2-3</span></div></div></div>
+    <div class="step-item"><div class="step-num sn-blue">6</div><div class="step-content"><div class="st">Onboarding</div><div class="sd">Presentar al equipo tecnico e iniciar la implementacion</div><div class="ss"><span class="tag tag-ok">Dia siguiente al pago</span></div></div></div>
+  </div>
+</div>
+
+<!-- ══ PLAN DE ACCION ══ -->
+<div id="accion" class="screen">
+  <div class="section-title">Plan de accion</div>
+  <div class="section-sub">Acciones ordenadas por prioridad antes del lanzamiento de mayo 2026</div>
+
+  <div class="card">
+    <h3>Criticas &mdash; esta semana</h3>
+    <div class="step-item"><div class="step-num sn-red">1</div><div class="step-content"><div class="st">Actualizar pricing en todos los materiales</div><div class="sd">Explora USD 2.200 &mdash; Impulsa USD 3.600 &mdash; mensual USD 150 por entidad en ambos planes</div><div class="ss"><span class="tag tag-danger">Comercial</span></div></div></div>
+    <div class="step-item"><div class="step-num sn-red">2</div><div class="step-content"><div class="st">Crear cronograma estandar de implementacion</div><div class="sd">Documento dia por dia desde la firma hasta produccion para mostrar al cliente</div><div class="ss"><span class="tag tag-danger">Tecnico</span></div></div></div>
+    <div class="step-item"><div class="step-num sn-red">3</div><div class="step-content"><div class="st">Incluir clausula de permanencia minima en contrato</div><div class="sd">Minimo 3 meses para proteger el modelo ante cancelaciones tempranas</div><div class="ss"><span class="tag tag-danger">Legal</span></div></div></div>
+  </div>
+
+  <div class="card">
+    <h3>Alta prioridad &mdash; mayo 2026</h3>
+    <div class="step-item"><div class="step-num sn-warn">4</div><div class="step-content"><div class="st">Preparar caso de exito con numeros reales</div><div class="sd">Antes / despues con horas ahorradas y errores eliminados de un cliente actual</div><div class="ss"><span class="tag tag-warn">David</span></div></div></div>
+    <div class="step-item"><div class="step-num sn-warn">5</div><div class="step-content"><div class="st">Optimizar perfil LinkedIn de David para prospeccion</div><div class="sd">Headline orientado al dolor del cliente, no al producto</div><div class="ss"><span class="tag tag-warn">David</span></div></div></div>
+    <div class="step-item"><div class="step-num sn-warn">6</div><div class="step-content"><div class="st">Construir lista de 200 empresas objetivo</div><div class="sd">Con nombre y contacto del Director Financiero o Tesorero de cada empresa</div><div class="ss"><span class="tag tag-warn">David</span></div></div></div>
+    <div class="step-item"><div class="step-num sn-warn">7</div><div class="step-content"><div class="st">Iniciar contenido LinkedIn &mdash; 3 posts por semana</div><div class="sd">Publicar sobre el problema, no sobre el producto. Arrancar el 1 de mayo.</div><div class="ss"><span class="tag tag-warn">David</span></div></div></div>
+    <div class="step-item"><div class="step-num sn-warn">8</div><div class="step-content"><div class="st">Ejecutar piloto con proveedor colombiano</div><div class="sd">1 entidad real. Medir costo y tiempo efectivos antes de negociar volumen.</div><div class="ss"><span class="tag tag-warn">Tecnico</span></div></div></div>
+  </div>
+
+  <div class="card">
+    <h3>Media prioridad &mdash; junio 2026</h3>
+    <div class="step-item"><div class="step-num sn-blue">9</div><div class="step-content"><div class="st">Evaluar resultado del piloto tercerizado</div><div class="sd">Decidir si escalar con el proveedor colombiano o mantener equipo interno</div><div class="ss"><span class="tag tag-info">Direccion</span></div></div></div>
+    <div class="step-item"><div class="step-num sn-blue">10</div><div class="step-content"><div class="st">Diseno de alerta de expansion</div><div class="sd">Notificar cuando un cliente llega al 80% de su techo de entidades para activar upsell</div><div class="ss"><span class="tag tag-info">Tecnico</span></div></div></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const planes={
+  explora:{nombre:"Explora",setup:2200,mrr:750,entidades:5,costoImpl:2405,comVend:350,comPM:300,comDev:300,lic:500,soporte:500},
+  impulsa:{nombre:"Impulsa",setup:3600,mrr:1500,entidades:10,costoImpl:4810,comVend:500,comPM:300,comDev:300,lic:500,soporte:1000}
+};
+
+let currentEsc = 'min';
+let customI = 2, customE = 2;
+
+function fmt(n){return"USD "+Math.round(n).toLocaleString('es-PY')}
+
+function show(id,btn){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function setEsc(esc, btn){
+  currentEsc = esc;
+  document.querySelectorAll('.esc-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('custom-controls').style.display = esc==='custom' ? 'block' : 'none';
+  updateProyeccion();
+}
+
+function updateSliders(){
+  customI = parseInt(document.getElementById('sl-impulsa').value);
+  customE = parseInt(document.getElementById('sl-explora').value);
+  document.getElementById('val-impulsa').textContent = customI;
+  document.getElementById('val-explora').textContent = customE;
+  const setupMes = customI*3600 + customE*2200;
+  const mrrMes = customI*1500 + customE*750;
+  document.getElementById('custom-preview').textContent =
+    'Setup por mes: ' + fmt(setupMes) + '  |  Nuevo MRR por mes: ' + fmt(mrrMes);
+  updateProyeccion();
+}
+
+function getConfig(){
+  if(currentEsc==='min') return {i:2,e:2};
+  if(currentEsc==='opt') return {i:3,e:3};
+  return {i:customI, e:customE};
+}
+
+function updateCostos(){
+  const p=planes[document.getElementById('plan-sel').value];
+  const ingresoTotal=p.setup+p.mrr*12;
+  const costoTotal=p.costoImpl+p.comVend+p.comPM+p.comDev+p.lic+p.soporte;
+  const margen=ingresoTotal-costoTotal;
+  const pct=Math.round(margen/ingresoTotal*100);
+  const recupero=(Math.max(0,p.costoImpl-p.setup)/p.mrr).toFixed(1);
+  document.getElementById('costos-title').textContent='Desglose anual — Plan '+p.nombre;
+  document.getElementById('costos-kpis').innerHTML=`
+    <div class="kpi"><div class="label">Ingreso anual</div><div class="value">${fmt(ingresoTotal)}</div><div class="sub">Setup + MRR x 12</div></div>
+    <div class="kpi"><div class="label">Costo total</div><div class="value">${fmt(costoTotal)}</div><div class="sub">Todos los costos</div></div>
+    <div class="kpi"><div class="label">Margen neto</div><div class="value" style="color:#15803d">${fmt(margen)}</div><div class="sub">${pct}% de margen</div></div>
+    <div class="kpi"><div class="label">Recupero setup</div><div class="value" style="font-size:18px;margin-top:4px">${recupero} meses</div><div class="sub">Con primer MRR</div></div>
+  `;
+  document.getElementById('ing-table').innerHTML=`
+    <tr><td>Setup unico</td><td class="num green">${fmt(p.setup)}</td></tr>
+    <tr><td>MRR anual: ${fmt(p.mrr)} x 12 meses</td><td class="num green">${fmt(p.mrr*12)}</td></tr>
+    <tr><td class="bold">Total ingresos</td><td class="num bold green">${fmt(ingresoTotal)}</td></tr>
+  `;
+  document.getElementById('cos-table').innerHTML=`
+    <tr><td>Implementacion: ${p.entidades} entidades x USD 481</td><td class="num red">${fmt(p.costoImpl)}</td></tr>
+    <tr><td>Comision vendedor (50/50 cierre y 30 dias)</td><td class="num red">${fmt(p.comVend)}</td></tr>
+    <tr><td>Comision PM</td><td class="num red">${fmt(p.comPM)}</td></tr>
+    <tr><td>Comision Desarrollador</td><td class="num red">${fmt(p.comDev)}</td></tr>
+    <tr><td>Licencia ElectroNeek anual</td><td class="num red">${fmt(p.lic)}</td></tr>
+    <tr><td>Soporte anual</td><td class="num red">${fmt(p.soporte)}</td></tr>
+    <tr><td class="bold">Total costos</td><td class="num bold red">${fmt(costoTotal)}</td></tr>
+  `;
+  document.getElementById('result-box').innerHTML=`
+    <div class="gl">Margen neto por cliente activo 12 meses</div>
+    <div class="gv">${fmt(margen)}</div>
+    <div class="gs">${pct}% de margen &mdash; Por cada cliente ${p.nombre} retenido un ano</div>
+  `;
+}
+
+function updateProyeccion(){
+  const cfg = getConfig();
+  const setupMes = cfg.i*3600 + cfg.e*2200;
+  const mrrNuevo = cfg.i*1500 + cfg.e*750;
+  const meses = ["Mayo 2026","Junio 2026","Julio 2026","Agosto 2026"];
+  let mrrAcum=0, totalCobrado=0, html="";
+
+  meses.forEach((mes,i)=>{
+    const s50=setupMes*0.5;
+    const s50p=i>0?setupMes*0.5:0;
+    const mrrE=mrrAcum;
+    mrrAcum+=mrrNuevo;
+    const total=s50+s50p+mrrE;
+    totalCobrado+=total;
+    html+=`<div class="month-block">
+      <div class="mh">
+        <div class="mn">${mes} &nbsp;<span style="font-size:12px;color:#6b7280">${cfg.i}I + ${cfg.e}E cerrados</span></div>
+        <div class="mt">${fmt(total)}</div>
+      </div>
+      <div class="income-row"><span>Setup 50% al cierre</span><span class="iv">${fmt(s50)}</span></div>
+      <div class="income-row"><span>Setup 50% del mes anterior</span><span class="iv">${i===0?"&mdash;":fmt(s50p)}</span></div>
+      <div class="income-row"><span>MRR clientes en produccion</span><span class="iv">${i===0?"&mdash;":fmt(mrrE)}</span></div>
+      <div><span class="mrr-pill">MRR desde mes siguiente: ${fmt(mrrAcum)} / mes</span></div>
+    </div>`;
+  });
+
+  document.getElementById('meses-container').innerHTML=html;
+  document.getElementById('proy-kpis').innerHTML=`
+    <div class="kpi"><div class="label">Total cobrado</div><div class="value">${fmt(totalCobrado)}</div><div class="sub">En 4 meses</div></div>
+    <div class="kpi"><div class="label">MRR desde sept.</div><div class="value" style="color:#15803d">${fmt(mrrAcum)}</div><div class="sub">Por mes garantizado</div></div>
+    <div class="kpi"><div class="label">Clientes activos</div><div class="value">${(cfg.i+cfg.e)*4}</div><div class="sub">Al cierre de agosto</div></div>
+    <div class="kpi"><div class="label">Setup x mes</div><div class="value">${fmt(setupMes)}</div><div class="sub">Bruto por mes</div></div>
+  `;
+}
+
+updateCostos();
+updateProyeccion();
+</script>
+</body>
+</html>
